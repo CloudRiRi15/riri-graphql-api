@@ -1,0 +1,45 @@
+schema {
+    query: Query
+    mutation: Mutation
+}
+
+type Query {
+    # Query for Student Information
+    getStudent(id: ID!): Student
+}
+
+type Mutation {
+    # Create Student
+    createStudent(input: CreateStudentInput!): Student
+
+    # Update Student
+    updateStudent(input: UpdateStudentInput!): Student
+
+    # delete student
+    deleteStudent(id: ID!): Student
+}
+
+input UpdateStudentInput {
+    Studentid: ID!
+    name: String!
+    age: Int!
+    subject: String!
+    grade: String!
+}
+
+input CreateStudentInput {
+    Studentid: ID!
+    name: String!
+    age: Int!
+    subject: String!
+    grade: String!
+}
+}
+
+type Student {
+    Studentid: ID
+    name: String
+    age: Int
+    Subject: String
+    grade: String
+}

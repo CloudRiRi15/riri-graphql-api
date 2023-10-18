@@ -1,0 +1,37 @@
+{
+  "name": "riri-graphql-api",
+  "version": "1.0.0",
+  "description": "hello world sample for nodejs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "sam local start-api", // Start SAM local API for local development
+    "build": "sam build", // Build the SAM application
+    "deploy": "sam deploy --guided", // Deploy the SAM application to AWS
+    "test": "jest", // Add your testing command here
+    "formatCheck": "prettier --check --ignore-path .gitignore \"./**/*.{js,json}\"",
+    "format": "prettier --write --ignore-path .gitignore \"./**/*.{js,json}\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/awslabs/aws-sam-cli/tree/develop/samcli/local/init/templates/cookiecutter-aws-sam-hello-nodejs"
+  },
+  "keywords": [
+    "sample",
+    "graphql",
+    "hello",
+    "world",
+    "api"
+  ],
+  "dependencies": {
+    "aws-sdk": "^2.1053.0",
+    "ulid": "^2.3.0"
+  },
+  "devDependencies": {
+    "aws-sam-local": "^1.29.0", // AWS SAM CLI for local development
+    "jest": "^27.4.7", // Testing framework (replace with your preferred testing framework)
+    // Add other development dependencies and testing libraries
+  },
+  "author": "sam cli",
+  "license": "ISC"
+}

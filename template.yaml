@@ -1,0 +1,158 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  A Serverless Graphql template for the riri-graphql-api
+
+# # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst  
+
+Globals:
+  Function:
+    Tracing: Active 
+    Runtime: nodejs18.x
+    CodeUri: src/
+    Timeout: 30
+
+Resources:    
+  StudentInfoTable:
+    Type: 'AWS::DynamoDB::Table'
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5   # Adjust the values as needed
+        WriteCapacityUnits: 5  # Adjust the values as needed
+      TableName: !Sub ${ServiceName}-dynamodb-${Stage}      
+
+  CreateStudentFunction:
+    Type: AWS::Serverless::Function
+    Description: 'Lambda function inserts student information into DynamoDB table'
+    Properties:
+      Handler: createStudent/index.handler
+      FunctionName: createStudentLambda
+      CodeUri: 'src\CreateStudent\createStudent.js' 
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - dynamodb:GetItem
+                - dynamodb:UpdateItem
+                - dynamodb:DeleteItem
+                - dynamodb:PutItem
+                - dynamodb:Scan
+                - dynamodb:Query
+              Resource: !Sub "arn:aws:dynamodb:${AWS::Region}:*:table/${DYNAMODB}"
+
+  GetStudentFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: getStudent/index.handler
+      FunctionName: getStudentLambda
+      CodeUri: './src/GetStudent/getStudent.js'
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - dynamodb:GetItem
+                - dynamodb:UpdateItem
+                - dynamodb:DeleteItem
+                - dynamodb:PutItem
+                - dynamodb:Scan
+                - dynamodb:Query
+              Resource: !Sub "arn:aws:dynamodb:${AWS::Region}:*:table/${DYNAMODB}"
+
+  UpdateStudentFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: updateStudent/index.handler
+      FunctionName: updateStudentLambda
+      CodeUri: './src/UpdateStudent/updateStudent.js' 
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - dynamodb:GetItem
+                - dynamodb:UpdateItem
+                - dynamodb:DeleteItem
+                - dynamodb:PutItem
+                - dynamodb:Scan
+                - dynamodb:Query
+              Resource: !Sub "arn:aws:dynamodb:${AWS::Region}:*:table/${DYNAMODB}"
+  DeleteStudentFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: deleteStudent/index.handler
+      FunctionName: deleteStudentLambda
+      CodeUri: './src/DeleteStudent/deleteStudent.js'
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - dynamodb:GetItem
+                - dynamodb:UpdateItem
+                - dynamodb:DeleteItem
+                - dynamodb:PutItem
+                - dynamodb:Scan
+                - dynamodb:Query
+              Resource: !Sub "arn:aws:dynamodb:${AWS::Region}:*:table/${DYNAMODB}"
+      
+ 
+  GraphqlAPI:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: src/
+      Handler: app.lambdaHandler
+      Runtime: nodejs18.x
+      Architectures:
+      - x86_64
+
+  ServerlessGraphQLApi:
+    Type: AWS::Serverless::GraphQLApi
+    Properties:
+      SchemaUri: ./src/schema.graphql
+      Auth:
+        Type: API_KEY
+      ApiKeys:
+        MyApiKey:
+          Description: my api key
+      DataSources:
+        DynamoDb:
+          Posts:
+            TableName: !Ref StudentinfoTable
+            TableArn: !GetAtt StudentinfoTable.Arn
+        Lambda:
+          GraphqlAPI:
+            FunctionArn: !GetAtt GraphqlAPI.Arn
+      
+Outputs:
+  ServerlessGraphQLApi:
+    Description: ServerlessGraphQLApi endpoint URL for Prod environment
+    Value: !GetAtt ServerlessGraphQLApi.GraphQLUrl
+  ServerlessGraphQLApiMyApiKey:
+    Description: API Key for ServerlessGraphQLApi
+    Value: !GetAtt ServerlessGraphQLApiMyApiKey.ApiKey
+  CreateStudentFunction:
+    Description: "Create Student Function ARN"
+    Value: !GetAtt CreateStudent Function.Arn
+
+  GetStudentFunction:
+    Description: "Get Student  Function ARN"
+    Value: !GetAtt GetStudent Function.Arn
+
+  UpdateStudentFunction:
+    Description: "Update Student  Function ARN"
+    Value: !GetAtt UpdateStudent Function.Arn
+
+  DeleteStudentFunction:
+    Description: "Delete Student  Function ARN"
+    Value: !GetAtt DeleteStudent Function.Arn    
+
+
+
